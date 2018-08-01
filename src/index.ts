@@ -31,7 +31,14 @@ async function main() {
 	} else {
 		console.log("Oracle already exists");
 
-		console.log('Filter', provider.listenQueries({}, console.log));
+		console.log('Filter', provider.listenQueries({}, function (err: any, data: any) {
+			if ( err ) throw err;
+
+			console.log('Query', data.returnValues.query, 'from', data.returnValues.subscriber);
+			provider.zapDispatch.respond({ queryId: data.returnValues.id, responseParams: ['0x00'], from: provider.providerOwner, dynamic: false }).then((txid: any) => {
+				console.log('Response Transaction', typeof txid == 'string' ? txid : txid.transactionHash);
+			})
+		}));
 	}
 }
 
